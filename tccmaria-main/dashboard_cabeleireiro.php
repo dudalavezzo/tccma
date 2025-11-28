@@ -31,8 +31,10 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 </style>
+
 </head>
 <body>
+  
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">💇‍♀️ Dashboard do Cabeleireiro</h2>
