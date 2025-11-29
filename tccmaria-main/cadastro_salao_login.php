@@ -1,37 +1,73 @@
 <?php
 include 'conexao.php';
 
+/* ---------------- FUNÇÃO PARA PEGAR LAT/LNG ---------------- */
+function getLatLng($endereco)
+{
+    $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($endereco) . "&format=json&limit=1";
+    $opts = [
+        "http" => [
+            "header" => "User-Agent: MyGeocoder/1.0\r\n"
+        ]
+    ];
+    $context = stream_context_create($opts);
+    $json = file_get_contents($url, false, $context);
+
+    if ($json === FALSE) {
+        return ['lat' => null, 'lng' => null];
+    }
+
+    $data = json_decode($json, true);
+
+    if (isset($data[0])) {
+        return [
+            'lat' => floatval($data[0]['lat']),
+            'lng' => floatval($data[0]['lon'])
+        ];
+    }
+
+    return ['lat' => null, 'lng' => null];
+}
+
+/* ---------------- PROCESSAMENTO DO FORM ---------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     // --- Dados do salão ---
     $nome_salao   = mysqli_real_escape_string($conn, $_POST['nome_salao']);
     $endereco     = mysqli_real_escape_string($conn, $_POST['endereco']);
     $telefone     = mysqli_real_escape_string($conn, $_POST['telefone']);
     $servicos     = isset($_POST['servicos']) ? implode(', ', $_POST['servicos']) : '';
 
-    // --- Horário de atendimento ---
+    // --- Horário ---
     $horario_inicio = $_POST['horario_inicio'];
     $horario_final  = $_POST['horario_final'];
     $pausa          = $_POST['pausa'];
 
-    // --- Conta do responsável ---
+    // --- Responsável ---
     $nome_usuario = mysqli_real_escape_string($conn, $_POST['nome_usuario']);
     $email        = mysqli_real_escape_string($conn, $_POST['email']);
     $senha        = password_hash($_POST['senha'], PASSWORD_DEFAULT);
 
-    // Verifica se o e-mail já existe
+    // --- GEOCODIFICAÇÃO ---
+    $coords = getLatLng($endereco);
+    $lat = $coords['lat'];
+    $lng = $coords['lng'];
+
+    // Verifica email
     $check_email = mysqli_query($conn, "SELECT id FROM usuarios WHERE email='$email'");
     if (mysqli_num_rows($check_email) > 0) {
-        $erro = "❌ Este e-mail já está cadastrado. Faça login ou use outro e-mail.";
+        $erro = "❌ Este e-mail já está cadastrado. Tente outro.";
     } else {
-        // Cria o usuário cabeleireiro
+
+        // Criar usuário
         $query_usuario = "INSERT INTO usuarios (nome, email, senha, tipo)
                           VALUES ('$nome_usuario', '$email', '$senha', 'cabeleireiro')";
         mysqli_query($conn, $query_usuario);
         $id_cabeleireiro = mysqli_insert_id($conn);
 
-        // Cria o salão vinculado
-        $query_salao = "INSERT INTO saloes (nome, endereco, telefone, usuario_id)
-                        VALUES ('$nome_salao', '$endereco', '$telefone', '$id_cabeleireiro')";
+        // Criar salão com LAT/LNG
+        $query_salao = "INSERT INTO saloes (nome, endereco, telefone, servicos, horario_inicio, horario_final, pausa, lat, lng, usuario_id)
+                        VALUES ('$nome_salao', '$endereco', '$telefone', '$servicos', '$horario_inicio', '$horario_final', '$pausa', '$lat', '$lng', '$id_cabeleireiro')";
         mysqli_query($conn, $query_salao);
 
         header("Location: dashboard_cabeleireiro.php");
@@ -46,13 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Cadastro de Salão</title>
 
-    <!-- ✅ Bootstrap -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- ✅ Fontes -->
+    <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <style>
+
+<style>
 :root {
   --brand: #111827;
   --accent: #6C5CE7;
@@ -196,56 +233,66 @@ button:hover {
 <body>
 
     <div class="card-cadastro">
-       <div class="header-logo">
-    <img src="logo.png" alt="Logo do Salão">
-    <h2>Cadastro de Salão</h2>
-</div>
-<?php if (isset($erro)): ?>
-                <div class="erro"><?= $erro; ?></div>
-            <?php endif; ?>
+
+        <div class="header-logo">
+            <img src="logo.png" alt="Logo do Salão">
+            <h2>Cadastro de Salão</h2>
+        </div>
+
+        <?php if (isset($erro)): ?>
+            <div class="erro"><?= $erro; ?></div>
+        <?php endif; ?>
 
         <form method="POST" action="cadastro_salao_login.php">
+
             <h3>Informações do Salão</h3>
+
             <input type="text" name="nome_salao" placeholder="Nome do Salão" required>
+
             <input type="text" name="endereco" placeholder="Endereço" required>
+
+            <!-- CAMPOS PARA LAT E LNG (OCULTOS) -->
+            <input type="hidden" name="lat">
+            <input type="hidden" name="lng">
+
             <input type="text" name="telefone" placeholder="Telefone" required>
 
             <h3>Serviços Oferecidos</h3>
+
             <label><input type="checkbox" name="servicos[]" value="Corte"> Corte</label>
             <label><input type="checkbox" name="servicos[]" value="Coloração"> Coloração</label>
             <label><input type="checkbox" name="servicos[]" value="Escova"> Escova</label>
             <label><input type="checkbox" name="servicos[]" value="Tratamentos Capilares"> Tratamentos Capilares</label>
 
             <h3>Horário de Atendimento</h3>
+
             <div class="row">
                 <div class="col-md-4">
                     <label>Início:</label>
                     <input type="time" name="horario_inicio" required>
                 </div>
+
                 <div class="col-md-4">
                     <label>Fim:</label>
                     <input type="time" name="horario_final" required>
                 </div>
+
                 <div class="col-md-4">
-                    <label>Pausa(1 hora):</label>
+                    <label>Pausa (1h):</label>
                     <input type="time" name="pausa">
                 </div>
             </div>
 
-            <h3>Conta do Responsável pelo Salão</h3>
+            <h3>Conta do Responsável</h3>
+
             <input type="text" name="nome_usuario" placeholder=" Nome" required>
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="senha" placeholder="Senha" required>
 
             <button type="submit">Cadastrar Salão e Conta</button>
 
-            <?php if (isset($erro)): ?>
-                <div class="erro"><?= $erro; ?></div>
-            <?php endif; ?>
         </form>
     </div>
 
-    <!-- ✅ Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

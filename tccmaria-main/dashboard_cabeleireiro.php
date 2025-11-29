@@ -17,21 +17,8 @@ $id_salao = $_SESSION['id']; // ID do salao (usuario cabeleireiro)
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body {
-  background: #f9f9fb;
-  font-family: 'Inter', sans-serif;
-  color: #333;
-}
-.container {
-  max-width: 1100px;
-  margin-top: 40px;
-}
-.card {
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-</style>
+
+   
 </head>
 <body>
 
