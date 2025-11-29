@@ -30,11 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id_cabeleireiro = mysqli_insert_id($conn);
 
         // Cria o salão vinculado
-        $query_salao = "INSERT INTO saloes (nome, endereco, telefone, id_cabeleireiro)
+        $query_salao = "INSERT INTO saloes (nome, endereco, telefone, usuario_id)
                         VALUES ('$nome_salao', '$endereco', '$telefone', '$id_cabeleireiro')";
         mysqli_query($conn, $query_salao);
 
-        //header("Location: dashboard_salao.php");
+        header("Location: dashboard_cabeleireiro.php");
         exit;
     }
 }
@@ -200,9 +200,11 @@ button:hover {
     <img src="logo.png" alt="Logo do Salão">
     <h2>Cadastro de Salão</h2>
 </div>
+<?php if (isset($erro)): ?>
+                <div class="erro"><?= $erro; ?></div>
+            <?php endif; ?>
 
-
-        <form method="POST" action="cadastro_salao.php">
+        <form method="POST" action="cadastro_salao_login.php">
             <h3>Informações do Salão</h3>
             <input type="text" name="nome_salao" placeholder="Nome do Salão" required>
             <input type="text" name="endereco" placeholder="Endereço" required>

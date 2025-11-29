@@ -7,7 +7,7 @@ if(!isset($_SESSION['id']) || $_SESSION['tipo'] != 'cabeleireiro'){
     exit; 
 }
 
-$id_usuario = $_SESSION['id'];
+$id_salao = $_SESSION['id']; // ID do salao (usuario cabeleireiro)
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -15,6 +15,7 @@ $id_usuario = $_SESSION['id'];
 <meta charset="UTF-8">
 <title>Dashboard do Cabeleireiro</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
@@ -23,7 +24,7 @@ body {
   color: #333;
 }
 .container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin-top: 40px;
 }
 .card {
@@ -31,10 +32,9 @@ body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 </style>
-
 </head>
 <body>
-  
+
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">💇‍♀️ Dashboard do Cabeleireiro</h2>
@@ -64,7 +64,8 @@ body {
 
   <div class="card mt-4 p-3">
     <h4>📅 Todos os Agendamentos do Salão</h4>
-    <div class="table-responsive">
+
+    <div class="table-responsive mt-3">
       <table class="table table-sm table-striped align-middle">
         <thead class="table-light">
           <tr>
@@ -76,14 +77,20 @@ body {
           </tr>
         </thead>
         <tbody>
+
         <?php
-        $res = mysqli_query($conn, "SELECT a.id, u.nome AS cliente, s.nome AS salao, h.data, h.hora, a.status 
+        $query = "
+          SELECT a.id, u.nome AS cliente, s.nome AS salao, h.data, h.hora, a.status 
           FROM agendamentos a 
           JOIN usuarios u ON a.id_usuario=u.id
           JOIN horarios h ON a.id_horario=h.id
           JOIN saloes s ON h.id_salao=s.id
-          ORDER BY h.data,h.hora");
-        
+          WHERE s.usuario_id = $id_salao
+          ORDER BY h.data, h.hora
+        ";
+
+        $res = mysqli_query($conn, $query);
+
         if (mysqli_num_rows($res) == 0) {
             echo "<tr><td colspan='5' class='text-center text-muted'>Nenhum agendamento encontrado.</td></tr>";
         } else {
@@ -103,82 +110,69 @@ body {
     </div>
   </div>
 </div>
-   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+// ID do salão
+const idSalao = <?= $id_salao ?>;
+
+// ========================== GRÁFICO DE SERVIÇOS ==========================
+fetch(`api/servicos_mes.php?id=${idSalao}`)
+  .then(res => res.json())
+  .then(dados => {
+      const ctx = document.getElementById('graficoServicos');
+      new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: dados.servicos,
+              datasets: [{
+                  label: 'Serviços Realizados',
+                  data: dados.qtd,
+                  backgroundColor: ['#a855f7', '#ec4899', '#38bdf8', '#facc15', '#10b981'],
+                  borderRadius: 8
+              }]
+          },
+          options: {
+              scales: {
+                  y: { beginAtZero: true }
+              },
+              plugins: {
+                  legend: { display: false }
+              }
+          }
+      });
+  })
+  .catch(err => console.error("Erro ao carregar gráfico de serviços:", err));
 
 
-// ========================== GRÁFICOS FICTÍCIOS ==========================
-async function  obterQTD(){
-  const resp = await fetch("http://localhost/tccmaria/graficos/servicos_mes.php?id="+<?php echo $_SESSION['id_salao']; ?>)
-  const dados = await resp.json()
-  console.log(dados)
-  return dados.qtd
-}
+// ========================== GRÁFICO DE AGENDAMENTOS ==========================
+fetch(`api/agendamentos_mes.php?id=${idSalao}`)
+  .then(res => res.json())
+  .then(dados => {
+      const ctx = document.getElementById('graficoAgendamentos');
+      new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: dados.dias,
+              datasets: [{
+                  label: 'Agendamentos Confirmados',
+                  data: dados.qtd,
+                  borderColor: '#f43f5e',
+                  backgroundColor: '#fda4af',
+                  fill: true,
+                  tension: 0.3
+              }]
+          },
+          options: {
+              scales: {
+                  y: { beginAtZero: true },
+                  x: { title: { display: true, text: 'Dia do mês' } }
+              }
+          }
+      });
+  })
+  .catch(err => console.error("Erro ao carregar gráfico de agendamentos:", err));
 
-async function  obterValores(){
-  const resp = await fetch("http://localhost/tccmaria/graficos/servicos_mes.php?id="+<?php echo $_SESSION['id_salao']; ?>)
-  const dados = await resp.json()
-  console.log(dados)
-  return dados.servicos
-}
-
-<?php 
-    $json = file_get_contents("http://localhost/tccmaria/graficos/servicos_mes.php?id=".$_SESSION['id_salao']);
-    $dados = json_decode($json, true); 
-    echo "const valores_grafico =". json_encode($dados["servicos"],JSON_UNESCAPED_UNICODE);
-    echo "\n";
-    echo "const qtd_grafico =".json_encode($dados["qtd"]);
-    
-    
-      
-?>
-
-
-
-// 1️⃣ Serviços realizados no mês
-const ctxServicos = document.getElementById('graficoServicos');
-new Chart(ctxServicos, {
-  type: 'bar',
-  data: {
-    labels: valores_grafico,
-    datasets: [{
-      label: 'Serviços Realizados',
-      data: qtd_grafico,
-      borderRadius: 8
-    }]
-  }, options: {
-    scales: {
-      y: { beginAtZero: true, title: { display: true, text: 'Quantidade' } }
-    },
-    plugins: {
-      legend: { display: false }
-    }
-  }
-  
-});
-
-// 2️⃣ Agendamentos do mês
-const ctxAg = document.getElementById('graficoAgendamentos');
-new Chart(ctxAg, {
-  type: 'line',
-  data: {
-    labels: ['01', '05', '10', '15', '20', '25', '30'],
-    datasets: [{
-      label: 'Agendamentos Confirmados',
-      data: [3, 6, 5, 9, 8, 10, 12],
-      borderColor: '#f43f5e',
-      backgroundColor: '#fda4af',
-      fill: true,
-      tension: 0.3
-    }]
-  },
-  options: {
-    scales: {
-      y: { beginAtZero: true, title: { display: true, text: 'Agendamentos' } },
-      x: { title: { display: true, text: 'Dia do mês' } }
-    }
-  }
-});
 </script>
+
 </body>
 </html>
