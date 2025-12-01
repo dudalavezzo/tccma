@@ -8,7 +8,7 @@ if (!isset($_SESSION['id']) || $_SESSION['tipo'] != 'cliente') {
 
 $id_cliente = $_SESSION['id'];
 
-// ===================== SALÃO =====================
+
 if (isset($_GET['salao_id'])) {
     $id_salao = (int)$_GET['salao_id'];
 } elseif (isset($_POST['salao_id'])) {
@@ -22,20 +22,20 @@ if (!$salao) {
     die("Salão não encontrado.");
 }
 
-// Data selecionada
+
 $data_selecionada = isset($_GET['data']) ? $_GET['data'] : null;
 
-// Para controlar a exibição do alerta de sucesso
+
 $sucesso = null;
 
-// ===================== CONFIRMAR AGENDAMENTO =====================
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data'], $_POST['hora'], $_POST['servico'], $_POST['pagamento'])) {
     $data = $_POST['data'];
     $hora = $_POST['hora'];
     $servico = mysqli_real_escape_string($conn, $_POST['servico']);
     $pagamento = mysqli_real_escape_string($conn, $_POST['pagamento']);
 
-    // Verifica horário
+
     $resHorario = mysqli_query($conn, "SELECT id FROM horarios 
         WHERE id_salao='$id_salao' AND data='$data' AND hora='$hora'");
     $horario = mysqli_fetch_assoc($resHorario);
@@ -47,20 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data'], $_POST['hora'
         $id_horario = $horario['id'];
     }
 
-    // Verifica agendamento existente
+
     $check = mysqli_query($conn, "SELECT id FROM agendamentos WHERE id_horario='$id_horario' AND status='agendado'");
     if (mysqli_num_rows($check) > 0) {
         die("<p>❌ Horário já agendado. Escolha outro.</p><a href='agendar.php?salao_id=$id_salao'>Voltar</a>");
     }
 
-    // Insere agendamento
+
     mysqli_query($conn, "INSERT INTO agendamentos (id_usuario,id_horario,id_servico,status)
         VALUES ('$id_cliente','$id_horario',(SELECT id FROM servicos WHERE nome='$servico' LIMIT 1),'agendado')");
 
-    // Atualiza horário para ocupado
+
     mysqli_query($conn, "UPDATE horarios SET disponivel=0 WHERE id='$id_horario'");
 
-    // ✅ Mostra alerta de sucesso nesta mesma página
+ 
     $sucesso = "✅ Agendamento confirmado para " . date('d/m/Y', strtotime($data)) .
                " às " . substr($hora,0,5) . " no salão " . htmlspecialchars($salao['nome']) . ".";
 }
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data'], $_POST['hora'
 <title>Agendar - <?= htmlspecialchars($salao['nome']) ?></title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-/* ===== Tokens e fundo padrão do projeto ===== */
+
 :root{
   --brand:#111827;
   --accent:#6C5CE7;
@@ -99,7 +99,7 @@ body{
   position:relative;
 }
 
-/* ===== Container ===== */
+
 .container{
   position:relative; z-index:1;
   width:min(92vw, 900px);
@@ -112,7 +112,7 @@ body{
   border:1px solid #eef0f3;
 }
 
-/* ===== Alerta de sucesso ===== */
+
 .alerta-sucesso{
   background:#ecfdf5;
   color:#065f46;
@@ -128,7 +128,7 @@ body{
 }
 .alerta-sucesso a:hover{ text-decoration:underline; }
 
-/* ===== Títulos ===== */
+
 h2{
   font-family:"Playfair Display", serif;
   font-weight:900;
@@ -144,7 +144,7 @@ h4{
   margin:14px 0 10px 0;
 }
 
-/* ===== Formulários & campos ===== */
+
 label{ display:block; font-weight:700; color:#374151; margin:8px 0 6px; }
 
 input[type="date"],
@@ -165,7 +165,7 @@ select:focus{
   box-shadow:0 0 0 4px rgba(162,155,254,.22);
 }
 
-/* ===== Botões ===== */
+
 .btn{
   display:inline-block;
   width:100%;
@@ -197,10 +197,10 @@ select:focus{
   box-shadow:0 14px 34px rgba(34,197,94,.38), 0 0 18px rgba(134,239,172,.28);
 }
 
-/* ===== Textos ===== */
+
 p{ color:#4b5563; margin:8px 0; }
 
-/* ===== Responsivo ===== */
+
 @media (max-width:560px){
   .container{ padding:22px 16px; border-radius:16px; }
   h2{ font-size:1.7rem; }
@@ -219,8 +219,8 @@ p{ color:#4b5563; margin:8px 0; }
 
   
 
-  <?php if (empty($sucesso)): // só mostra os formulários se ainda não confirmou ?>
-    <!-- Form escolher data -->
+  <?php if (empty($sucesso)): ?>
+ 
     <form method="GET" action="agendar.php">
         <input type="hidden" name="salao_id" value="<?= $id_salao ?>">
         <label for="data"><strong>Selecione o dia desejado:</strong></label>

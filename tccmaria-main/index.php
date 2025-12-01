@@ -2,13 +2,13 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <!-- Bootstrap 5 -->
+ 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Fonte moderna -->
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
-<!-- Tema visual (não altera sua estrutura) -->
+
  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -26,16 +26,16 @@
   margin: 0;
   font-family: "Inter", sans-serif;
   background:
-    radial-gradient(60% 60% at 0% 0%, rgba(250,146,196,0.65) 0%, rgba(250,146,196,0.1) 200%),   /* #FA92C4 */
-    radial-gradient(60% 60% at 100% 0%, rgba(189,169,223,0.6) 0%, rgba(189,169,223,0.1) 200%), /* #BDA9DF */
-    radial-gradient(80% 80% at 50% 100%, rgba(161,202,224,0.7) 0%, rgba(161,202,224,0.15) 200%), /* #A1CAE0 */
+    radial-gradient(60% 60% at 0% 0%, rgba(250,146,196,0.65) 0%, rgba(250,146,196,0.1) 200%),   
+    radial-gradient(60% 60% at 100% 0%, rgba(189,169,223,0.6) 0%, rgba(189,169,223,0.1) 200%), 
+    radial-gradient(80% 80% at 50% 100%, rgba(161,202,224,0.7) 0%, rgba(161,202,224,0.15) 200%), 
     #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-  /* Centraliza tudo verticalmente */
+
   body{
     display:flex;
     flex-direction:column;
@@ -45,7 +45,7 @@
     padding:4rem 1rem;
   }
 
-  /* Título principal com fonte Playfair Display */
+
   h1:first-of-type{
     font-family:"Playfair Display", serif;
     font-weight:900;
@@ -56,18 +56,18 @@
     color:#0b0b0f;
   }
 
-  /* Subtítulo "Faça seu login!" */
+
   h1:nth-of-type(2){
-  font-weight:400; /* leve, mas ainda legível */
+  font-weight:400; 
   color:var(--muted);
-  font-size:clamp(1.1rem, 0.8vw + 0.5rem, 1.1rem); /* menor e responsivo */
+  font-size:clamp(1.1rem, 0.8vw + 0.5rem, 1.1rem); 
   margin-top:0.2rem;
   margin-bottom:1.8rem;
 }
 
   
 
-  /* Container dos botões */
+
   .botoes-login{
     display:flex;
     justify-content:center;
@@ -75,7 +75,7 @@
     flex-wrap:wrap;
   }
 
-  /* Botões (links) */
+
   a{
     display:inline-block;
     text-decoration:none;

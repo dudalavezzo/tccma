@@ -1,15 +1,15 @@
 <?php
-// dashboard_cliente.php
+
 session_start();
 $id_usuario = $_SESSION['id'] ?? 1;
 
 $conn = new mysqli("localhost", "root", "", "agendamentos");
 if ($conn->connect_error) {
   die("Erro DB");
-   // favor trocar aqui o nome do banco para "agendamento"
+ 
 }
 
-// buscar agendamentos do usuário
+
 $sql = "SELECT a.id, s.nome AS salao, h.data, h.hora, a.status
         FROM agendamentos a
         JOIN horarios h ON a.id_horario = h.id
@@ -22,7 +22,7 @@ $stmt->execute();
 $res = $stmt->get_result();
 $agendamentos = $res->fetch_all(MYSQLI_ASSOC);
 
-// buscar saloes diretamente do banco
+
 $saloes = [];
 $resS = $conn->query("SELECT id, nome, endereco, lat, lng FROM saloes ORDER BY nome ASC");
 if ($resS) $saloes = $resS->fetch_all(MYSQLI_ASSOC);
@@ -72,7 +72,7 @@ if ($resS) $saloes = $resS->fetch_all(MYSQLI_ASSOC);
     </div>
 
     <div class="row g-3">
-      <!-- MAPA -->
+  
       <div class="col-lg-8">
         <div class="card card-salao p-3 mb-3">
           <div class="d-flex justify-content-between align-items-center mb-2">
@@ -87,7 +87,7 @@ if ($resS) $saloes = $resS->fetch_all(MYSQLI_ASSOC);
           <div id="map"></div>
         </div>
 
-        <!-- Gráficos -->
+      
         <div class="row g-3">
           <div class="col-md-6">
             <div class="card p-3">
@@ -128,7 +128,7 @@ if ($resS) $saloes = $resS->fetch_all(MYSQLI_ASSOC);
         </div>
       </div>
 
-      <!-- LADO DIREITO -->
+     
       <div class="col-lg-4">
         <div class="card p-3 mb-3">
           <h5>💅 Meus Agendamentos</h5>
@@ -159,12 +159,12 @@ if ($resS) $saloes = $resS->fetch_all(MYSQLI_ASSOC);
     </div>
   </div>
 
-  <!-- Scripts -->
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // === MAPA ===
+  
     const map = L.map('map').setView([-22.3145, -49.0602], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap'
@@ -204,7 +204,7 @@ if ($resS) $saloes = $resS->fetch_all(MYSQLI_ASSOC);
     <?php endif;
     endforeach; ?>
 
-    // === GRÁFICOS FICTÍCIOS ===
+
     new Chart(document.getElementById('graficoServicos'), {
       type: 'bar',
       data: {

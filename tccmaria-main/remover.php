@@ -73,10 +73,10 @@ if (mysqli_num_rows($check_email) > 0) {
     <meta charset="UTF-8">
     <title>Cadastro de Salão</title>
 
-    <!-- ✅ Bootstrap -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- ✅ Fontes -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -90,16 +90,16 @@ body {
   margin: 0;
   font-family: "Inter", sans-serif;
   background:
-    radial-gradient(60% 60% at 0% 0%, rgba(250,146,196,0.65) 0%, rgba(250,146,196,0.1) 200%),   /* #FA92C4 */
-    radial-gradient(60% 60% at 100% 0%, rgba(189,169,223,0.6) 0%, rgba(189,169,223,0.1) 200%), /* #BDA9DF */
-    radial-gradient(80% 80% at 50% 100%, rgba(161,202,224,0.7) 0%, rgba(161,202,224,0.15) 200%), /* #A1CAE0 */
+    radial-gradient(60% 60% at 0% 0%, rgba(250,146,196,0.65) 0%, rgba(250,146,196,0.1) 200%),  
+    radial-gradient(60% 60% at 100% 0%, rgba(189,169,223,0.6) 0%, rgba(189,169,223,0.1) 200%), 
+    radial-gradient(80% 80% at 50% 100%, rgba(161,202,224,0.7) 0%, rgba(161,202,224,0.15) 200%), 
     #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ====== CARD ====== */
+
 .card-cadastro {
   width: 100%;
   max-width: 500px;
@@ -115,7 +115,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* ====== HEADER COM LOGO E TÍTULO ====== */
+
 .header-logo {
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@ body {
   margin: 0;
 }
 
-/* ====== SUBTÍTULOS ====== */
+
 h3 {
   font-size: 1.1rem;
   font-weight: 700;
@@ -149,7 +149,7 @@ h3 {
   margin-bottom: 0.8rem;
 }
 
-/* ====== CAMPOS ====== */
+
 input {
   width: 100%;
   padding: 0.9rem 1rem;
@@ -167,7 +167,7 @@ input:focus {
   outline: none;
 }
 
-/* ====== BOTÃO ====== */
+
 button {
   width: 100%;
   padding: 0.9rem 1rem;
@@ -187,7 +187,7 @@ button:hover {
   box-shadow: 0 10px 26px rgba(108,92,231,.45);
 }
 
-/* ====== ALERTAS ====== */
+
 .alerta-sucesso {
   background: #ecfdf5;
   color: #065f46;
@@ -237,7 +237,7 @@ a:hover {
         <?php endif; ?>
     </div>
 
-    <!-- ✅ Bootstrap JS -->
+   
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

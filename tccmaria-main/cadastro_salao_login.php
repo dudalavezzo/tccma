@@ -1,7 +1,7 @@
 <?php
 include 'conexao.php';
 
-/* ---------------- FUNÇÃO PARA PEGAR LAT/LNG ---------------- */
+
 function getLatLng($endereco)
 {
     $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($endereco) . "&format=json&limit=1";
@@ -29,43 +29,43 @@ function getLatLng($endereco)
     return ['lat' => null, 'lng' => null];
 }
 
-/* ---------------- PROCESSAMENTO DO FORM ---------------- */
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // --- Dados do salão ---
+  
     $nome_salao   = mysqli_real_escape_string($conn, $_POST['nome_salao']);
     $endereco     = mysqli_real_escape_string($conn, $_POST['endereco']);
     $telefone     = mysqli_real_escape_string($conn, $_POST['telefone']);
     $servicos     = isset($_POST['servicos']) ? implode(', ', $_POST['servicos']) : '';
 
-    // --- Horário ---
+
     $horario_inicio = $_POST['horario_inicio'];
     $horario_final  = $_POST['horario_final'];
     $pausa          = $_POST['pausa'];
 
-    // --- Responsável ---
+ 
     $nome_usuario = mysqli_real_escape_string($conn, $_POST['nome_usuario']);
     $email        = mysqli_real_escape_string($conn, $_POST['email']);
     $senha        = password_hash($_POST['senha'], PASSWORD_DEFAULT);
 
-    // --- GEOCODIFICAÇÃO ---
+
     $coords = getLatLng($endereco);
     $lat = $coords['lat'];
     $lng = $coords['lng'];
 
-    // Verifica email
+
     $check_email = mysqli_query($conn, "SELECT id FROM usuarios WHERE email='$email'");
     if (mysqli_num_rows($check_email) > 0) {
         $erro = "❌ Este e-mail já está cadastrado. Tente outro.";
     } else {
 
-        // Criar usuário
+
         $query_usuario = "INSERT INTO usuarios (nome, email, senha, tipo)
                           VALUES ('$nome_usuario', '$email', '$senha', 'cabeleireiro')";
         mysqli_query($conn, $query_usuario);
         $id_cabeleireiro = mysqli_insert_id($conn);
 
-        // Criar salão com LAT/LNG
+
         $query_salao = "INSERT INTO saloes (nome, endereco, telefone, servicos, horario_inicio, horario_final, pausa, lat, lng, usuario_id)
                         VALUES ('$nome_salao', '$endereco', '$telefone', '$servicos', '$horario_inicio', '$horario_final', '$pausa', '$lat', '$lng', '$id_cabeleireiro')";
         mysqli_query($conn, $query_salao);
@@ -82,10 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Cadastro de Salão</title>
 
-    <!-- Bootstrap -->
+ 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Fontes -->
+
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 
@@ -100,16 +100,16 @@ body {
   margin: 0;
   font-family: "Inter", sans-serif;
   background:
-    radial-gradient(60% 60% at 0% 0%, rgba(250,146,196,0.65) 0%, rgba(250,146,196,0.1) 200%),   /* #FA92C4 */
-    radial-gradient(60% 60% at 100% 0%, rgba(189,169,223,0.6) 0%, rgba(189,169,223,0.1) 200%), /* #BDA9DF */
-    radial-gradient(80% 80% at 50% 100%, rgba(161,202,224,0.7) 0%, rgba(161,202,224,0.15) 200%), /* #A1CAE0 */
+    radial-gradient(60% 60% at 0% 0%, rgba(250,146,196,0.65) 0%, rgba(250,146,196,0.1) 200%), 
+    radial-gradient(60% 60% at 100% 0%, rgba(189,169,223,0.6) 0%, rgba(189,169,223,0.1) 200%), 
+    radial-gradient(80% 80% at 50% 100%, rgba(161,202,224,0.7) 0%, rgba(161,202,224,0.15) 200%), 
     #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ====== CARD ====== */
+
 .card-cadastro {
   width: 100%;
   max-width: 600px;
@@ -124,7 +124,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* ====== TÍTULOS ====== */
+
 h2 {
   font-family: "Playfair Display", serif;
   font-weight: 900;
@@ -142,7 +142,7 @@ h3 {
   margin-bottom: 0.8rem;
 }
 
-/* ====== CAMPOS ====== */
+
 input, select {
   width: 100%;
   padding: 0.8rem 1rem;
@@ -160,7 +160,7 @@ input:focus, select:focus {
   outline: none;
 }
 
-/* ====== CHECKBOX ====== */
+
 label {
   display: block;
   text-align: left;
@@ -168,7 +168,7 @@ label {
   font-size: 0.95rem;
 }
 
-/* ====== BOTÃO ====== */
+
 button {
   width: 100%;
   padding: 0.9rem 1rem;
@@ -188,7 +188,7 @@ button:hover {
   box-shadow: 0 10px 26px rgba(108,92,231,.45);
 }
 
-/* ====== ERRO ====== */
+
 .erro {
   color: #b91c1c;
   font-weight: 500;
@@ -198,7 +198,7 @@ button:hover {
   padding: 0.6rem;
   text-align: center;
 }
-/* ====== HEADER COM LOGO E TÍTULO ====== */
+
 .header-logo {
   display: flex;
   align-items: center;
@@ -251,7 +251,7 @@ button:hover {
 
             <input type="text" name="endereco" placeholder="Endereço" required>
 
-            <!-- CAMPOS PARA LAT E LNG (OCULTOS) -->
+            
             <input type="hidden" name="lat">
             <input type="hidden" name="lng">
 

@@ -8,7 +8,7 @@ if (!isset($_SESSION['id']) || $_SESSION['tipo'] != 'cliente') {
 
 $id_cliente = $_SESSION['id'];
 
-// ===================== 1️⃣ CLIENTE CONFIRMOU O AGENDAMENTO =====================
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data']) && isset($_POST['hora'])) {
 
     $id_salao = $_POST['salao'];
@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data']) && isset($_PO
     $servico = mysqli_real_escape_string($conn, $_POST['servico']);
     $pagamento = mysqli_real_escape_string($conn, $_POST['pagamento']);
 
-    // Verifica se já existe horário cadastrado e livre para o salão
+    
     $resHorario = mysqli_query($conn, "SELECT id FROM horarios 
         WHERE id_salao = '$id_salao' AND data = '$data' AND hora = '$hora' AND disponivel = 1");
     $horario = mysqli_fetch_assoc($resHorario);
 
-    // Se não existir o horário ainda, cria
+   
     if (!$horario) {
         mysqli_query($conn, "INSERT INTO horarios (id_salao, data, hora, disponivel) VALUES ('$id_salao', '$data', '$hora', 1)");
         $id_horario = mysqli_insert_id($conn);
@@ -30,19 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data']) && isset($_PO
         $id_horario = $horario['id'];
     }
 
-    // Verifica se já tem agendamento neste horário
+  
     $verifica = mysqli_query($conn, "SELECT id FROM agendamentos WHERE id_horario = '$id_horario' AND status = 'agendado'");
     if (mysqli_num_rows($verifica) > 0) {
         die("<p>❌ Esse horário acabou de ser agendado por outra pessoa. Escolha outro horário.</p>");
     }
 
-    // Insere o agendamento
+
     mysqli_query($conn, "INSERT INTO agendamentos (id_usuario, id_horario, id_servico, status)
                          VALUES ('$id_cliente', '$id_horario', 
                                  (SELECT id FROM servicos WHERE nome='$servico' LIMIT 1),
                                  'agendado')");
 
-    // Marca o horário como ocupado
+  
     mysqli_query($conn, "UPDATE horarios SET disponivel=0 WHERE id='$id_horario'");
     header("Location: dashboard_cliente.php?sucesso=1");
     exit;
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['data']) && isset($_PO
     exit;
 }
 
-// ===================== 2️⃣ SELECIONA O SALÃO =====================
+
 if (!isset($_GET['salao'])) {
     die("Nenhum salão selecionado.");
 }
@@ -66,7 +66,7 @@ if (!$salao) {
     die("Salão não encontrado.");
 }
 
-// ===================== 3️⃣ SELECIONA DATA =====================
+
 $data_selecionada = isset($_GET['data']) ? $_GET['data'] : null;
 
 ?>
@@ -98,7 +98,7 @@ select, input[type=date], button { width: 100%; margin-bottom: 15px; }
 <div class="container">
 <h2>Agendar no salão <?= htmlspecialchars($salao['nome']) ?></h2>
 
-<!-- ===================== FORM DE ESCOLHA DE DATA ===================== -->
+
 <form method="GET" action="agendar.php">
     <input type="hidden" name="salao" value="<?= $id_salao ?>">
     <label for="data"><strong>Selecione o dia desejado:</strong></label>
@@ -107,7 +107,7 @@ select, input[type=date], button { width: 100%; margin-bottom: 15px; }
 </form>
 
 <?php
-// ===================== 4️⃣ SE A DATA FOI ESCOLHIDA =====================
+
 if ($data_selecionada) {
     $inicio = strtotime($salao['horario_inicio']);
     $fim = strtotime($salao['horario_final']);
@@ -115,13 +115,13 @@ if ($data_selecionada) {
 
     echo "<h4>Horários disponíveis para " . date('d/m/Y', strtotime($data_selecionada)) . "</h4>";
 
-    // Gera todos os horários possíveis conforme o expediente
+
     $horarios_disponiveis = [];
-    for ($hora = $inicio; $hora <= $fim; $hora += 1800) { // 30 em 30 min
-        if ($pausa && ($hora >= $pausa && $hora <= $pausa + 3600)) continue; // pula pausa
+    for ($hora = $inicio; $hora <= $fim; $hora += 1800) { 
+        if ($pausa && ($hora >= $pausa && $hora <= $pausa + 3600)) continue; 
         $hora_formatada = date('H:i:s', $hora);
 
-        // Verifica se já tem agendamento nesse horário
+        
         $check = mysqli_query($conn, "
             SELECT a.id FROM agendamentos a
             JOIN horarios h ON a.id_horario = h.id
@@ -138,7 +138,7 @@ if ($data_selecionada) {
     if (count($horarios_disponiveis) == 0) {
         echo "<p>Nenhum horário disponível neste dia.</p>";
     } else {
-        // Serviços do salão
+
         $servicos = !empty($salao['servicos']) ? array_map('trim', explode(',', $salao['servicos'])) : ['Corte', 'Coloração', 'Escova', 'Tratamentos Capilares'];
 
         echo '<form method="POST" action="agendar.php">';
