@@ -82,7 +82,7 @@ body {
           JOIN saloes s ON h.id_salao=s.id
           where s.id = $_SESSION[id_salao]
           ORDER BY h.data,h.hora");
-        
+      
         if (mysqli_num_rows($res) == 0) {
             echo "<tr><td colspan='5' class='text-center text-muted'>Nenhum agendamento encontrado.</td></tr>";
         } else {
@@ -109,7 +109,7 @@ body {
 <?php 
 $url_base =  $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'];
 
-    $json = file_get_contents($url_base."/tccmaria/graficos/servicos_mes.php?id=".$_SESSION['id_salao']);
+    $json = file_get_contents($url_base."/tccma/tccmaria-main/graficos/servicos_mes.php?id=".$_SESSION['id_salao']);
     $dados =json_decode($json, true); 
    
    
@@ -117,6 +117,14 @@ $url_base =  $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'];
     echo "\n";
     echo "const qtd_grafico =".json_encode($dados["qtd"]);
     
+    echo "\n";
+    $json = file_get_contents($url_base."/tccma/tccmaria-main/graficos/agendamentos_mes.php?id=".$_SESSION['id_salao']);
+    $dados =json_decode($json, true); 
+    echo "const valores_dias =". json_encode($dados["dias"],JSON_UNESCAPED_UNICODE);
+    echo "\n";
+    echo "const qtd_grafico2 =".json_encode($dados["qtd"]);
+
+
     
       
 ?>
@@ -147,10 +155,10 @@ const ctxAg = document.getElementById('graficoAgendamentos');
 new Chart(ctxAg, {
   type: 'line',
   data: {
-    labels: ['01', '05', '10', '15', '20', '25', '30'],
+    labels: valores_dias,
     datasets: [{
       label: 'Agendamentos Confirmados',
-      data: [3, 6, 5, 9, 8, 10, 12],
+      data: qtd_grafico2,
       borderColor: '#f43f5e',
       backgroundColor: '#fda4af',
       fill: true,
