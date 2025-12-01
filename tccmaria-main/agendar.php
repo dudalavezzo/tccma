@@ -256,7 +256,16 @@ p{ color:#4b5563; margin:8px 0; }
             echo "<p>Nenhum horário disponível neste dia.</p>";
         } else {
             $servicos = !empty($salao['servicos']) ? array_map('trim', explode(',', $salao['servicos'])) : ['Corte','Coloração','Escova','Tratamentos Capilares'];
-
+            
+            $sql_servico_salao = "select * from servicos where id in (".implode(",",$servicos).")";
+            $result_servico = mysqli_query($conn, $sql_servico_salao);
+            $servicos_query = [];
+            while($s = mysqli_fetch_assoc($result_servico))
+            {
+              $servicos_query[] = $s;
+             
+            }
+           
             echo '<form method="POST" action="agendar.php">';
             echo '<input type="hidden" name="salao_id" value="'.$id_salao.'">';
             echo '<input type="hidden" name="data" value="'.$data_selecionada.'">';
@@ -269,9 +278,11 @@ p{ color:#4b5563; margin:8px 0; }
             echo '</select>';
 
             echo '<label for="servico"><strong>Serviço desejado:</strong></label>';
+           
             echo '<select name="servico" required><option value="">-- Escolher serviço --</option>';
-            foreach ($servicos as $s) {
-                echo '<option value="'.htmlspecialchars($s).'">'.htmlspecialchars($s).'</option>';
+
+            foreach ($servicos_query as $s) {
+                echo '<option value="'.htmlspecialchars($s["id"]).'">'.htmlspecialchars($s["nome"]).'</option>';
             }
             echo '</select>';
 
