@@ -258,11 +258,18 @@ button:hover {
             <input type="text" name="telefone" placeholder="Telefone" required>
 
             <h3>Serviços Oferecidos</h3>
-
-            <label><input type="checkbox" name="servicos[]" value="Corte"> Corte</label>
-            <label><input type="checkbox" name="servicos[]" value="Coloração"> Coloração</label>
-            <label><input type="checkbox" name="servicos[]" value="Escova"> Escova</label>
-            <label><input type="checkbox" name="servicos[]" value="Tratamentos Capilares"> Tratamentos Capilares</label>
+          <?php 
+            $sql = "Select * from Servicos";
+            $resultados_servicos = mysqli_query($conn, $sql);
+            if(mysqli_num_rows($resultados_servicos) >0)
+            {
+              while($linha = mysqli_fetch_assoc($resultados_servicos)){
+                 echo "<label><input type='checkbox' name='servicos[]' value='".$linha["id"]."' value='Corte'> ".$linha["nome"]."</label>";
+              }
+            }else{
+              echo "Nenhum serviço cadastrado";
+            }
+           ?>
 
             <h3>Horário de Atendimento</h3>
 
